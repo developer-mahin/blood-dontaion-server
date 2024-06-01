@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { AuthControllers } from "./auth.controller";
 import validateRequest from "../../Middlewares/validateRequest";
+import { AuthControllers } from "./auth.controller";
 import { AuthValidation } from "./auth.validation";
 import auth from "../../Middlewares/auth";
 
@@ -18,13 +18,11 @@ router.post(
   AuthControllers.userLogin
 );
 
-router.get("/my-profile", auth, AuthControllers.myProfile);
-
-router.put(
-  "/my-profile",
+router.post(
+  "/change-password",
   auth,
-  validateRequest(AuthValidation.userProfileSchema),
-  AuthControllers.updateMyProfile
+  validateRequest(AuthValidation.changePasswordSchema),
+  AuthControllers.changePassword
 );
 
 export const AuthRoutes = router;

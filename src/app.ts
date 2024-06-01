@@ -8,11 +8,16 @@ import router from "./app/routes";
 const app: Application = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api", router);
+app.use("/api/v1", router);
 
 app.use("/", (req: Request, res: Response, next: NextFunction) => {
   res.json({

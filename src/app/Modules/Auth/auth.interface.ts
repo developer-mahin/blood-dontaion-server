@@ -10,3 +10,8 @@ export type TRegisterUser = {
   bio: string;
   lastDonationDate: string;
 };
+
+export type TChangePassword = {
+  currentPassword: string;
+  newPassword: string;
+};

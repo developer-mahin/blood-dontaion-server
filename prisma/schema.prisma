@@ -91,6 +91,8 @@ model User {
   bloodType    BloodGroup
   location     String
   availability Boolean        @default(false)
+  role         UserRole       @default(DONOR)
+  status       UserStatus     @default(ACTIVE)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   userProfile  UserProfile?
@@ -105,7 +107,9 @@ model UserProfile {
   userId           String   @unique
   bio              String
   age              Int
-  lastDonationDate String
+  contactNumber    String?
+  photo            String?
+  lastDonationDate String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -148,4 +152,15 @@ enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum UserRole {
+  DONOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  DEACTIVE
+  BLOCKED
 }

@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
 import AppError from "../../utils/AppError";
 import prisma from "../../utils/prisma";
-import { TRegisterUser } from "./auth.interface";
+import { TChangePassword, TRegisterUser } from "./auth.interface";
 import passwordHashed from "../../utils/passwordHashed";
 import { User, UserProfile } from "@prisma/client";
 import comparePassword from "../../utils/comparePassword";
@@ -124,68 +124,44 @@ const loginUser = async (payload: Pick<User, "email" | "password">) => {
   });
 
   return {
-    result,
     accessToken,
     refreshToken,
   };
 };
 
-const getMyProfile = async (user: TAuthUser) => {
-  const findUser = await prisma.user.findUnique({
+const changePassword = async (user: TAuthUser, payload: TChangePassword) => {
+  const isUserExist = await prisma.user.findUniqueOrThrow({
     where: {
-      id: user.userId,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      bloodType: true,
-      location: true,
-      availability: true,
-      createdAt: true,
-      updatedAt: true,
-      userProfile: true,
+      email: user.email,
     },
   });
 
-  if (!findUser) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized");
+  const isMatchedPassword = await comparePassword(
+    payload.currentPassword,
+    isUserExist.password
+  );
+
+  if (!isMatchedPassword) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Please Enter valid email or password"
+    );
   }
 
-  return findUser;
-};
+  const hashPassword = await passwordHashed(payload.newPassword, 10);
 
-const updateMyProfileIntoDB = async (
-  user: TAuthUser,
-  payload: Partial<UserProfile>
-) => {
-  const findUser = await prisma.userProfile.findUnique({
+  await prisma.user.update({
     where: {
-      userId: user.userId,
-    },
-  });
-
-  if (!findUser) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized");
-  }
-
-  const result = await prisma.userProfile.update({
-    where: {
-      userId: user.userId,
+      email: isUserExist.email,
     },
     data: {
-      bio: payload.bio || findUser.bio,
-      age: payload.age || findUser.age,
-      lastDonationDate: payload.lastDonationDate || findUser.lastDonationDate,
+      password: hashPassword,
     },
   });
-
-  return result;
 };
 
 export const AuthServices = {
   userRegistrationIntoDB,
   loginUser,
-  getMyProfile,
-  updateMyProfileIntoDB,
+  changePassword,
 };

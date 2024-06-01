@@ -39,24 +39,15 @@ const userLoginSchema = z.object({
   }),
 });
 
-const userProfileSchema = z.object({
+const changePasswordSchema = z.object({
   body: z.object({
-    age: z
-      .number({ required_error: "Age field is required." })
-      .int()
-      .optional(),
-    bio: z.string({ invalid_type_error: "Bio field is required." }).optional(),
-    lastDonationDate: z
-      .string({ required_error: "LastDonationDate field is required." })
-      .regex(/^\d{4}-\d{2}-\d{2}$/, {
-        message: "Invalid date format. Date should be in YYYY-MM-DD format",
-      })
-      .optional(),
+    oldPassword: z.string({ required_error: "oldPassword field is required." }),
+    newPassword: z.string({ required_error: "newPassword field is required." }),
   }),
 });
 
 export const AuthValidation = {
   userRegistrationSchema,
   userLoginSchema,
-  userProfileSchema,
+  changePasswordSchema,
 };

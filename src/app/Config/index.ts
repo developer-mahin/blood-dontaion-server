@@ -12,4 +12,6 @@ export default {
   access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN,
   refresh_secret: process.env.JWT_REFRESH_SECRET,
   refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN,
+  admin_email: process.env.ADMIN_EMAIL,
+  admin_pass: process.env.ADMIN_PASS,
 };

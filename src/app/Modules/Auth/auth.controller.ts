@@ -1,8 +1,8 @@
 import httpStatus from "http-status";
+import Config from "../../Config";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { AuthServices } from "./auth.service";
-import Config from "../../Config";
 import { TAuthUser } from "../../../Interfaces/auth";
 
 const userRegistration = catchAsync(async (req, res) => {
@@ -17,9 +17,7 @@ const userRegistration = catchAsync(async (req, res) => {
 });
 
 const userLogin = catchAsync(async (req, res) => {
-  const { accessToken, refreshToken, result } = await AuthServices.loginUser(
-    req.body
-  );
+  const { accessToken, refreshToken } = await AuthServices.loginUser(req.body);
 
   res.cookie("refreshToken", refreshToken, {
     secure: Config.node_env === "production",
@@ -31,39 +29,24 @@ const userLogin = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     message: "User logged in successfully",
     data: {
-      ...result,
       token: accessToken,
     },
   });
 });
 
-const myProfile = catchAsync(async (req, res) => {
-  const user = req.user as TAuthUser;
-  const result = await AuthServices.getMyProfile(user);
+const changePassword = catchAsync(async (req, res) => {
+  const user = req.user;
+  await AuthServices.changePassword(user as TAuthUser, req.body);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Profile retrieved successfully",
-    data: result,
-  });
-});
-
-const updateMyProfile = catchAsync(async (req, res) => {
-  const user = req.user as TAuthUser;
-  const result = await AuthServices.updateMyProfileIntoDB(user, req.body);
-
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "User profile updated successfully",
-    data: result,
+    message: "Password Changed Successfully",
   });
 });
 
 export const AuthControllers = {
   userRegistration,
   userLogin,
-  myProfile,
-  updateMyProfile,
+  changePassword,
 };
