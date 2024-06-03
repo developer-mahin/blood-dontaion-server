@@ -13,6 +13,12 @@ const updateUserProfileSchema = z.object({
         message: "Invalid date format. Date should be in YYYY-MM-DD format",
       })
       .optional(),
+    contactNumber: z
+      .string({ invalid_type_error: "contactNumber field is required." })
+      .optional(),
+    photo: z
+      .string({ invalid_type_error: "photo field is required." })
+      .optional(),
   }),
 });
 

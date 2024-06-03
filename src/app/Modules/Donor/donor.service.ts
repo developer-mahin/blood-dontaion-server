@@ -6,8 +6,7 @@ import { paginateQuery } from "../../utils/paginateQuery";
 import prisma from "../../utils/prisma";
 import {
   bloodGroup,
-  donorSearchableQuery,
-  donorSearchableQueryWithOutBlood,
+  donorSearchableQueryWithOutBlood
 } from "./donor.constant";
 
 const getAllDonorFromDB = async (query: any, options: any) => {
@@ -71,6 +70,8 @@ const getAllDonorFromDB = async (query: any, options: any) => {
       bloodType: true,
       location: true,
       availability: true,
+      isDontate: true,
+      isRequest: true,
       createdAt: true,
       updatedAt: true,
       userProfile: true,

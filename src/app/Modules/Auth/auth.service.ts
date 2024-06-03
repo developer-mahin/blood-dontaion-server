@@ -1,14 +1,14 @@
+import { User } from "@prisma/client";
 import httpStatus from "http-status";
-import AppError from "../../utils/AppError";
-import prisma from "../../utils/prisma";
-import { TChangePassword, TRegisterUser } from "./auth.interface";
-import passwordHashed from "../../utils/passwordHashed";
-import { User, UserProfile } from "@prisma/client";
-import comparePassword from "../../utils/comparePassword";
-import { generateJwtToken } from "../../utils/generateToken";
-import Config from "../../Config";
 import { Secret } from "jsonwebtoken";
 import { TAuthUser } from "../../../Interfaces/auth";
+import Config from "../../Config";
+import AppError from "../../utils/AppError";
+import comparePassword from "../../utils/comparePassword";
+import { generateJwtToken } from "../../utils/generateToken";
+import passwordHashed from "../../utils/passwordHashed";
+import prisma from "../../utils/prisma";
+import { TChangePassword, TRegisterUser } from "./auth.interface";
 
 const userRegistrationIntoDB = async (payload: TRegisterUser) => {
   const isExist = await prisma.user.findUnique({
@@ -26,44 +26,16 @@ const userRegistrationIntoDB = async (payload: TRegisterUser) => {
 
   const hashPassword = await passwordHashed(payload.password, 10);
 
-  const result = await prisma.$transaction(async (transactionClient) => {
-    const newUser = await transactionClient.user.create({
-      data: {
-        name: payload.name,
-        email: payload.email,
-        password: hashPassword,
-        bloodType: payload.bloodType,
-        location: payload.location,
-      },
-    });
+  console.log(payload);
 
-    await transactionClient.userProfile.create({
-      data: {
-        userId: newUser.id,
-        bio: payload.bio,
-        age: 12,
-        lastDonationDate: payload.lastDonationDate,
-      },
-    });
-
-    const result = await transactionClient.user.findUnique({
-      where: {
-        id: newUser.id,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        bloodType: true,
-        location: true,
-        availability: true,
-        createdAt: true,
-        updatedAt: true,
-        userProfile: true,
-      },
-    });
-
-    return result;
+  const result = await prisma.user.create({
+    data: {
+      name: payload.name,
+      email: payload.email,
+      password: hashPassword,
+      bloodType: payload.bloodType,
+      location: payload.location,
+    },
   });
 
   return result;
@@ -98,6 +70,7 @@ const loginUser = async (payload: Pick<User, "email" | "password">) => {
   const userInfo = {
     userId: isExist.id,
     email: isExist.email,
+    role: isExist.role,
   };
 
   const accessToken = generateJwtToken(
@@ -112,7 +85,7 @@ const loginUser = async (payload: Pick<User, "email" | "password">) => {
     Config.refresh_expires_in as string
   );
 
-  const result = await prisma.user.findUnique({
+  await prisma.user.findUnique({
     where: {
       id: isExist.id,
     },

@@ -6,9 +6,10 @@ import AppError from "../utils/AppError";
 import catchAsync from "../utils/catchAsync";
 import prisma from "../utils/prisma";
 import { verifyToken } from "../utils/verifyToken";
+import { UserRole, UserStatus } from "@prisma/client";
 
-const auth = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+const auth = (...roles: UserRole[]) => {
+  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
 
     if (!token) {
@@ -32,8 +33,20 @@ const auth = catchAsync(
       throw new AppError(httpStatus.FORBIDDEN, "User not found");
     }
 
+    if (user?.status === UserStatus.BLOCKED) {
+      throw new AppError(httpStatus.CONFLICT, "You are a blocked user");
+    }
+
+    if (user?.status === UserStatus.DEACTIVE) {
+      throw new AppError(httpStatus.CONFLICT, "You are a deactivated user");
+    }
+
+    if (roles.length && !roles.includes(decoded.role)) {
+      throw new AppError(httpStatus.FORBIDDEN, "Forbidden Access");
+    }
+
     next();
-  }
-);
+  });
+};
 
 export default auth;

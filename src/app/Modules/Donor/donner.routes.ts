@@ -10,16 +10,16 @@ router.get("/donor-list", DonorControllers.getAllDonor);
 
 router.post(
   "/donation-request",
-  auth,
+  auth(),
   validateRequest(DonorValidation.donationRequestSchema),
   DonorControllers.donationRequest
 );
 
-router.get("/donation-request", auth, DonorControllers.getDonationRequest);
+router.get("/donation-request", auth(), DonorControllers.getDonationRequest);
 
 router.put(
   "/donation-request/:requestId",
-  auth,
+  auth(),
   validateRequest(DonorValidation.updateDonationStatus),
   DonorControllers.updateDonationStatus
 );

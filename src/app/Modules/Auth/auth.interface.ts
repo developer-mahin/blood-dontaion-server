@@ -6,9 +6,9 @@ export type TRegisterUser = {
   password: string;
   bloodType: BloodGroup;
   location: string;
-  age: number;
-  bio: string;
-  lastDonationDate: string;
+  age?: number;
+  bio?: string;
+  lastDonationDate?: string;
 };
 
 export type TChangePassword = {

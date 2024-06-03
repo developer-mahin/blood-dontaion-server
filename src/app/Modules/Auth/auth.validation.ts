@@ -12,22 +12,23 @@ const BloodType = z.enum([
 ]);
 
 const userRegistrationSchema = z.object({
-  body: z.object({
-    name: z.string({ required_error: "Name field is required." }),
-    email: z
-      .string({ required_error: "Email must be a valid email address." })
-      .email(),
-    password: z.string({ required_error: "Password field is required." }),
-    bloodType: BloodType,
-    location: z.string({ required_error: "Location field is required." }),
-    age: z.number({ required_error: "Age field is required." }).int(),
-    bio: z.string({ invalid_type_error: "Bio field is required." }),
-    lastDonationDate: z
-      .string({ required_error: "LastDonationDate field is required." })
-      .regex(/^\d{4}-\d{2}-\d{2}$/, {
-        message: "Invalid date format. Date should be in YYYY-MM-DD format",
+  body: z
+    .object({
+      name: z.string({ required_error: "Name field is required." }),
+      email: z
+        .string({ required_error: "Email must be a valid email address." })
+        .email(),
+      password: z.string({ required_error: "Password field is required." }),
+      confirmPassword: z.string({
+        required_error: "confirmPassword field is required.",
       }),
-  }),
+      bloodType: BloodType,
+      location: z.string({ required_error: "Location field is required." }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: "Passwords don't match",
+      path: ["confirmPassword"],
+    }),
 });
 
 const userLoginSchema = z.object({
