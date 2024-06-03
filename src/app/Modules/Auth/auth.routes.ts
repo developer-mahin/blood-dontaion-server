@@ -18,9 +18,11 @@ router.post(
   AuthControllers.userLogin
 );
 
+router.post("/refresh-token", AuthControllers.refreshToken);
+
 router.post(
   "/change-password",
-  auth,
+  auth(),
   validateRequest(AuthValidation.changePasswordSchema),
   AuthControllers.changePassword
 );

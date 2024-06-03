@@ -7,7 +7,7 @@ import prisma from "../../utils/prisma";
 import { bloodGroup } from "../Donor/donor.constant";
 import { userSearchableFieldWithOutBlood } from "./user.constant";
 
-const getAllUserFromDB = async (query: any, options: any) => {
+const getAllUserFromDB = async (user: TAuthUser, query: any, options: any) => {
   const { limit, page, skip, sortBy, sortOrder } = paginateQuery(options);
   const { searchTerm, ...filteredData } = query;
 
@@ -48,8 +48,14 @@ const getAllUserFromDB = async (query: any, options: any) => {
   }
 
   const whereCondition: Prisma.UserWhereInput = { AND: andConditions };
+  const withOutMe = {
+    id: {
+      not: user.userId,
+    },
+  };
+
   const result = await prisma.user.findMany({
-    where: { ...whereCondition },
+    where: { ...whereCondition, ...withOutMe },
     skip,
     take: limit,
     select: {
@@ -62,6 +68,7 @@ const getAllUserFromDB = async (query: any, options: any) => {
       role: true,
       status: true,
       isRequest: true,
+      isDontate: true,
       createdAt: true,
       userProfile: true,
     },
@@ -179,9 +186,35 @@ const updateMyProfileIntoDB = async (
   return result;
 };
 
+const updateProfileStatusIntoDB = async (id: string, payload: any) => {
+  const { status } = payload;
+
+  const isExist = await prisma.user.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  if (isExist.status !== UserStatus.ACTIVE) {
+    throw new AppError(httpStatus.BAD_REQUEST, "This user is already blocked");
+  }
+
+  const result = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      status: status,
+    },
+  });
+
+  return result;
+};
+
 export const UserServices = {
   getMyProfile,
   updateMyProfileIntoDB,
   getAllUserFromDB,
   getSingleUserFromDB,
+  updateProfileStatusIntoDB,
 };

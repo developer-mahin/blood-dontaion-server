@@ -1,6 +1,6 @@
-import { User } from "@prisma/client";
+import { User, UserStatus } from "@prisma/client";
 import httpStatus from "http-status";
-import { Secret } from "jsonwebtoken";
+import { JwtPayload, Secret } from "jsonwebtoken";
 import { TAuthUser } from "../../../Interfaces/auth";
 import Config from "../../Config";
 import AppError from "../../utils/AppError";
@@ -9,6 +9,7 @@ import { generateJwtToken } from "../../utils/generateToken";
 import passwordHashed from "../../utils/passwordHashed";
 import prisma from "../../utils/prisma";
 import { TChangePassword, TRegisterUser } from "./auth.interface";
+import { verifyToken } from "../../utils/verifyToken";
 
 const userRegistrationIntoDB = async (payload: TRegisterUser) => {
   const isExist = await prisma.user.findUnique({
@@ -26,8 +27,6 @@ const userRegistrationIntoDB = async (payload: TRegisterUser) => {
 
   const hashPassword = await passwordHashed(payload.password, 10);
 
-  console.log(payload);
-
   const result = await prisma.user.create({
     data: {
       name: payload.name,
@@ -35,6 +34,7 @@ const userRegistrationIntoDB = async (payload: TRegisterUser) => {
       password: hashPassword,
       bloodType: payload.bloodType,
       location: payload.location,
+      isDontate: payload.isDonate,
     },
   });
 
@@ -102,6 +102,39 @@ const loginUser = async (payload: Pick<User, "email" | "password">) => {
   };
 };
 
+const refreshToken = async (token: string) => {
+  let userData;
+
+  try {
+    userData = verifyToken(token, Config.refresh_secret!) as JwtPayload;
+  } catch (error) {
+    throw new Error("Your are not authorized");
+  }
+
+  const isUserExist = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: userData.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  const userInfo = {
+    userId: isUserExist.id,
+    email: isUserExist.email,
+    role: isUserExist.role,
+  };
+
+  const generateToken = generateJwtToken(
+    userInfo,
+    Config.access_secret as string,
+    Config.access_expires_in as string
+  );
+
+  return {
+    accessToken: generateToken,
+  };
+};
+
 const changePassword = async (user: TAuthUser, payload: TChangePassword) => {
   const isUserExist = await prisma.user.findUniqueOrThrow({
     where: {
@@ -136,5 +169,6 @@ const changePassword = async (user: TAuthUser, payload: TChangePassword) => {
 export const AuthServices = {
   userRegistrationIntoDB,
   loginUser,
+  refreshToken,
   changePassword,
 };

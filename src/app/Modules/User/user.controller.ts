@@ -7,10 +7,11 @@ import pick from "../../utils/pick";
 import { donorSearchableQuery } from "../Donor/donor.constant";
 
 const getAllUser = catchAsync(async (req, res) => {
+  const user = req.user as TAuthUser;
   const filter = pick(req.query, [...donorSearchableQuery, "searchTerm"]);
   const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
 
-  const result = await UserServices.getAllUserFromDB(filter, options);
+  const result = await UserServices.getAllUserFromDB(user, filter, options);
 
   sendResponse(res, {
     success: true,
@@ -56,9 +57,22 @@ const updateMyProfile = catchAsync(async (req, res) => {
   });
 });
 
+const updateProfileStatus = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await UserServices.updateProfileStatusIntoDB(id, req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User profile updated successfully",
+    data: result,
+  });
+});
+
 export const UserControllers = {
   myProfile,
   updateMyProfile,
   getAllUser,
   getSingleUser,
+  updateProfileStatus,
 };
