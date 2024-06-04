@@ -123,6 +123,9 @@ const getMyProfile = async (user: TAuthUser) => {
       id: true,
       name: true,
       email: true,
+      role: true,
+      isDontate: true,
+      isRequest: true,
       bloodType: true,
       location: true,
       availability: true,
@@ -160,7 +163,7 @@ const updateMyProfileIntoDB = async (
     throw new AppError(httpStatus.BAD_REQUEST, "Your are not an active user");
   }
 
-  const result = await prisma.$transaction(async (transactionClient) => {
+  await prisma.$transaction(async (transactionClient) => {
     if (userData && Object.keys(userData).length) {
       await transactionClient.user.update({
         where: {
@@ -181,6 +184,23 @@ const updateMyProfileIntoDB = async (
         contactNumber: contactNumber,
       },
     });
+  });
+
+  const result = await prisma.user.findUnique({
+    where: {
+      id: user.userId,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      bloodType: true,
+      location: true,
+      availability: true,
+      createdAt: true,
+      updatedAt: true,
+      userProfile: true,
+    },
   });
 
   return result;

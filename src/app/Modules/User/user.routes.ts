@@ -20,7 +20,7 @@ router.get(
   UserControllers.myProfile
 );
 
-router.put(
+router.patch(
   "/update-profile",
   auth(UserRole.ADMIN, UserRole.DONOR),
   validateRequest(UserValidation.updateUserProfileSchema),

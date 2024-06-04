@@ -9,8 +9,8 @@ const updateUserProfileSchema = z.object({
     bio: z.string({ invalid_type_error: "Bio field is required." }).optional(),
     lastDonationDate: z
       .string({ required_error: "LastDonationDate field is required." })
-      .regex(/^\d{4}-\d{2}-\d{2}$/, {
-        message: "Invalid date format. Date should be in YYYY-MM-DD format",
+      .regex(/^\d{2}-\d{2}-\d{4}$/, {
+        message: "Invalid date format. Date should be in DD-MM-YYYY format",
       })
       .optional(),
     contactNumber: z
