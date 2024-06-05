@@ -27,15 +27,30 @@ const userRegistrationIntoDB = async (payload: TRegisterUser) => {
 
   const hashPassword = await passwordHashed(payload.password, 10);
 
-  const result = await prisma.user.create({
-    data: {
-      name: payload.name,
-      email: payload.email,
-      password: hashPassword,
-      bloodType: payload.bloodType,
-      location: payload.location,
-      isDontate: payload.isDonate,
-    },
+  const result = await prisma.$transaction(async (transactionClient) => {
+    const newUser = await transactionClient.user.create({
+      data: {
+        name: payload.name,
+        email: payload.email,
+        password: hashPassword,
+        bloodType: payload.bloodType,
+        location: payload.location,
+        isDontate: payload.isDonate,
+      },
+    });
+
+    await transactionClient.userProfile.create({
+      data: {
+        userId: newUser.id,
+        bio: "",
+        age: 0,
+        lastDonationDate: "",
+        photo: "",
+        contactNumber: "",
+      },
+    });
+
+    return newUser;
   });
 
   return result;
@@ -164,6 +179,8 @@ const changePassword = async (user: TAuthUser, payload: TChangePassword) => {
       password: hashPassword,
     },
   });
+
+  return isUserExist;
 };
 
 export const AuthServices = {

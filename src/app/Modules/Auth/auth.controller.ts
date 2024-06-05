@@ -49,12 +49,13 @@ const refreshToken = catchAsync(async (req, res) => {
 
 const changePassword = catchAsync(async (req, res) => {
   const user = req.user;
-  await AuthServices.changePassword(user as TAuthUser, req.body);
+  const result = await AuthServices.changePassword(user as TAuthUser, req.body);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: "Password Changed Successfully",
+    data: result,
   });
 });
 

@@ -1,4 +1,10 @@
-import { Prisma, User, UserProfile, UserStatus } from "@prisma/client";
+import {
+  Prisma,
+  User,
+  UserProfile,
+  UserRole,
+  UserStatus,
+} from "@prisma/client";
 import httpStatus from "http-status";
 import { TAuthUser } from "../../../Interfaces/auth";
 import AppError from "../../utils/AppError";
@@ -109,6 +115,7 @@ const getSingleUserFromDB = async (id: string) => {
       createdAt: true,
       updatedAt: true,
       userProfile: true,
+      donor: true,
     },
   });
   return result;
@@ -163,28 +170,43 @@ const updateMyProfileIntoDB = async (
     throw new AppError(httpStatus.BAD_REQUEST, "Your are not an active user");
   }
 
-  await prisma.$transaction(async (transactionClient) => {
-    if (userData && Object.keys(userData).length) {
-      await transactionClient.user.update({
-        where: {
-          id: user.userId,
-        },
-        data: userData,
-      });
-    }
-    await transactionClient.userProfile.update({
-      where: {
-        userId: user.userId,
-      },
-      data: {
-        bio: bio,
-        age: age,
-        lastDonationDate: lastDonationDate,
-        photo: photo,
-        contactNumber: contactNumber,
-      },
-    });
+  const userProfile = await prisma.userProfile.findUnique({
+    where: {
+      userId: user.userId,
+    },
   });
+
+  if (!userProfile) {
+    throw new AppError(httpStatus.NOT_FOUND, "User profile not found");
+  }
+
+  const updateUserData = await prisma.$transaction(
+    async (transactionClient) => {
+      if (userData && Object.keys(userData).length) {
+        await transactionClient.user.update({
+          where: {
+            id: user.userId,
+          },
+          data: userData,
+        });
+      }
+      const result = await transactionClient.userProfile.update({
+        where: {
+          userId: user.userId,
+        },
+        data: {
+          bio: bio,
+          age: age,
+          lastDonationDate: lastDonationDate,
+          photo: photo,
+          contactNumber: contactNumber,
+        },
+      });
+      return result;
+    }
+  );
+
+  console.log(updateUserData);
 
   const result = await prisma.user.findUnique({
     where: {

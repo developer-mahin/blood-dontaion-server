@@ -1,5 +1,11 @@
-export const donorSearchableQuery = ["name", "email", "location", "bloodType"];
-export const donorSearchableQueryWithOutBlood = ["name", "email", "location",];
+export const donorSearchableQuery = [
+  "name",
+  "email",
+  "location",
+  "bloodType",
+  "availability",
+];
+export const donorSearchableQueryWithOutBlood = ["name", "email", "location"];
 
 export const bloodGroup = [
   "A_POSITIVE",

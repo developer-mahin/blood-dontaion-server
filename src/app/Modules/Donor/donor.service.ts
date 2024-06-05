@@ -1,18 +1,18 @@
-import { Prisma, RequestModel } from "@prisma/client";
+import { Prisma, RequestModel, UserRole } from "@prisma/client";
 import httpStatus from "http-status";
 import { TAuthUser } from "../../../Interfaces/auth";
 import AppError from "../../utils/AppError";
 import { paginateQuery } from "../../utils/paginateQuery";
 import prisma from "../../utils/prisma";
-import {
-  bloodGroup,
-  donorSearchableQueryWithOutBlood
-} from "./donor.constant";
+import { bloodGroup, donorSearchableQueryWithOutBlood } from "./donor.constant";
 
 const getAllDonorFromDB = async (query: any, options: any) => {
   const { page, limit, sortBy, sortOrder, skip } = paginateQuery(options);
   const { searchTerm, ...filteredData } = query;
   const andCondition: Prisma.UserWhereInput[] = [];
+
+  console.log(searchTerm)
+
 
   const blood = bloodGroup.find((item) => item === searchTerm);
   if (query?.searchTerm && blood && query.searchTerm === blood) {
@@ -40,6 +40,7 @@ const getAllDonorFromDB = async (query: any, options: any) => {
       },
     });
   } else if (Object.keys(filteredData).length > 0) {
+    console.log(filteredData);
     andCondition.push({
       AND: Object.keys(filteredData).map((key) => ({
         [key]: {
@@ -50,9 +51,14 @@ const getAllDonorFromDB = async (query: any, options: any) => {
   }
 
   const whereCondition: Prisma.UserWhereInput = { AND: andCondition };
+  const withOutAdmin = {
+    role: {
+      not: "ADMIN" as UserRole,
+    },
+  };
 
   const result = await prisma.user.findMany({
-    where: whereCondition,
+    where: { ...whereCondition, ...withOutAdmin },
     skip,
     take: limit,
     orderBy:

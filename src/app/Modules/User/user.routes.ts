@@ -10,7 +10,7 @@ const router = Router();
 router.get("/get-all-user", auth(UserRole.ADMIN), UserControllers.getAllUser);
 router.get(
   "/get-single-user/:id",
-  auth(UserRole.ADMIN),
+  auth(UserRole.ADMIN, UserRole.DONOR),
   UserControllers.getSingleUser
 );
 
