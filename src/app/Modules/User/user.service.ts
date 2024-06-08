@@ -229,6 +229,8 @@ const updateMyProfileIntoDB = async (
 const updateProfileStatusIntoDB = async (id: string, payload: any) => {
   const { status } = payload;
 
+  console.log(payload);
+
   const isExist = await prisma.user.findUniqueOrThrow({
     where: {
       id,
@@ -251,10 +253,38 @@ const updateProfileStatusIntoDB = async (id: string, payload: any) => {
   return result;
 };
 
+const updateProfileRoleIntoDB = async (id: string, payload: any) => {
+  const { role } = payload;
+
+  console.log(payload);
+
+  const isExist = await prisma.user.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  if (isExist.status !== UserStatus.ACTIVE) {
+    throw new AppError(httpStatus.BAD_REQUEST, "This user is already blocked");
+  }
+
+  const result = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      role: role,
+    },
+  });
+
+  return result;
+};
+
 export const UserServices = {
   getMyProfile,
   updateMyProfileIntoDB,
   getAllUserFromDB,
   getSingleUserFromDB,
   updateProfileStatusIntoDB,
+  updateProfileRoleIntoDB,
 };

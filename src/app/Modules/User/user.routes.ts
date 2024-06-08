@@ -33,4 +33,10 @@ router.patch(
   UserControllers.updateProfileStatus
 );
 
+router.patch(
+  "/update-role/:id",
+  auth(UserRole.ADMIN),
+  UserControllers.updateProfileRole
+);
+
 export const UserRoutes = router;
