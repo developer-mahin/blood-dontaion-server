@@ -37,8 +37,6 @@ export const seedAdmin = async () => {
           age: 12,
         },
       });
-
-      console.log(newUser);
     });
 
     console.log("Admin created successfully!");

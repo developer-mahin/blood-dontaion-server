@@ -14,7 +14,9 @@ In this project I have use Zod for data validation. Authentication and authoriza
 Authentication:
 Users are required to register and log in to access to Read, Write, And Updating features. JSON Web Tokens (JWT) are used for authentication.
 
-#### SERVER_URL : https://blooddonationproject.vercel.app/
+#### SERVER_URL : https://blooddonationserverv2.vercel.app/
+
+#### FRONT_END_URL : https://blooddonationclient.vercel.app/
 
 # Functionality:
 
@@ -24,6 +26,7 @@ Users are required to register and log in to access to Read, Write, And Updating
 
 - User Registration
 - Login User
+- Change Password
 - Reading My Profile
 - Update My Profile
 
@@ -33,7 +36,8 @@ Users are required to register and log in to access to Read, Write, And Updating
 
 - Reading All Donor List
 - Add Donation Request
-- Get My Donation Request
+- Get My Donation Request -- Me as a requester
+- Get My Donation -- Me as a donor
 - Update Donation Status
 
 ### Install Dependencies / Dependencies that i have used
@@ -58,16 +62,11 @@ Users are required to register and log in to access to Read, Write, And Updating
 
 - URL- https://documenter.getpostman.com/view/24264729/2sA2r824DT
 
-### LIVE URL
-
-- SERVER - URL- https://sellsmanagement.vercel.app/
-- CLIENT - URL- https://loquacious-horse-20d902.netlify.app/
-
 ### User Management // api
 
 ### i. User Registration
 
-- POST http://localhost:5000/api/register
+- POST http://localhost:5000/api/v1/auth/register
 
 ```json
 // in below i am sharing a json data formate for register user
@@ -85,7 +84,7 @@ Users are required to register and log in to access to Read, Write, And Updating
 
 ### ii. Login User
 
-- POST http://localhost:5000/api/login
+- POST http://localhost:5000/api/v1/auth/login
 
 ```json
 // in below i am sharing a json data formate for login user
@@ -97,7 +96,7 @@ Users are required to register and log in to access to Read, Write, And Updating
 
 ### iii. Retrieve My Profile
 
-- GET http://localhost:5000/api/my-profile
+- GET http://localhost:5000/api/v1/user/my-profile
 
 ```
 Authorization: <JWT_TOKEN>
@@ -132,7 +131,7 @@ Authorization: <JWT_TOKEN>
 
 ### iv. Update My Profile
 
-- PUT http://localhost:5000/api/my-profile
+- PUT http://localhost:5000/api/v1/user/my-profile
 
 ```
 Authorization: <JWT_TOKEN>
@@ -149,7 +148,7 @@ Authorization: <JWT_TOKEN>
 
 ### i. Create Donation Request
 
-- POST http://localhost:5000/api/donation-request
+- POST http://localhost:5000/api/v1/donor/donation-request
 
 ```
 Authorization: <JWT_TOKEN>
@@ -169,7 +168,7 @@ Authorization: <JWT_TOKEN>
 
 ### ii. Get Donation Request
 
-- GET http://localhost:5000/api/donor-list
+- GET http://localhost:5000/api/v1/donor/donor-list
 
 ```
 Authorization: <JWT_TOKEN>
@@ -212,7 +211,7 @@ Authorization: <JWT_TOKEN>
 
 ### iii. Get My Donation Request
 
-- GET http://localhost:5000/api/donation-request
+- GET http://localhost:5000/api/v1/donor/donation-request
 
 ```
 Authorization: <JWT_TOKEN>
@@ -273,7 +272,7 @@ Response:
 
 ### iv. Update Donation Request Status
 
-- PUT http://localhost:5000/api/donation-request/:requestId
+- PUT http://localhost:5000/api/v1/donor/donation-request/:requestId
 
 ```
 Authorization: <JWT_TOKEN>

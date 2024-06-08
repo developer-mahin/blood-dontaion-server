@@ -17,8 +17,6 @@ const handleZodError = (error: ZodError): TGenericErrorResponse => {
     .join(",")
     .replace(/,\s*/g, " ");
 
-  console.log(errors);
-
   return {
     statusCode,
     message: errors,

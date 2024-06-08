@@ -11,7 +11,6 @@ const getAllDonorFromDB = async (query: any, options: any) => {
   const { searchTerm, ...filteredData } = query;
   const andCondition: Prisma.UserWhereInput[] = [];
 
-  console.log(searchTerm);
 
   const blood = bloodGroup.find((item) => item === searchTerm);
   if (query?.searchTerm && blood && query.searchTerm === blood) {
@@ -39,7 +38,6 @@ const getAllDonorFromDB = async (query: any, options: any) => {
       },
     });
   } else if (Object.keys(filteredData).length > 0) {
-    console.log(filteredData);
     andCondition.push({
       AND: Object.keys(filteredData).map((key) => ({
         [key]: {
@@ -185,8 +183,6 @@ const getDonationRequestFromDB = async (user: TAuthUser) => {
 const getMyDonationFromDB = async (user: TAuthUser) => {
   const { userId } = user;
 
-  console.log(user);
-
   const donationRequests = await prisma.requestModel.findMany({
     where: {
       donorId: userId,
@@ -213,11 +209,6 @@ const updateDonationStatusIntoDB = async (
   id: string,
   payload: Pick<RequestModel, "requestStatus">
 ) => {
-
-  console.log(payload)
-
-
-
 
   const isExist = await prisma.requestModel.findUnique({
     where: {

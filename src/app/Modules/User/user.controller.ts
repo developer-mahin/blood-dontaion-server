@@ -48,9 +48,6 @@ const myProfile = catchAsync(async (req, res) => {
 const updateMyProfile = catchAsync(async (req, res) => {
   const user = req.user as TAuthUser;
   const result = await UserServices.updateMyProfileIntoDB(user, req.body);
-
-  console.log(result);
-
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
