@@ -206,8 +206,6 @@ const updateMyProfileIntoDB = async (
     }
   );
 
-  console.log(updateUserData);
-
   const result = await prisma.user.findUnique({
     where: {
       id: user.userId,

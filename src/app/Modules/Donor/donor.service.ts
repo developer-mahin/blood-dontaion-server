@@ -11,8 +11,7 @@ const getAllDonorFromDB = async (query: any, options: any) => {
   const { searchTerm, ...filteredData } = query;
   const andCondition: Prisma.UserWhereInput[] = [];
 
-  console.log(searchTerm)
-
+  console.log(searchTerm);
 
   const blood = bloodGroup.find((item) => item === searchTerm);
   if (query?.searchTerm && blood && query.searchTerm === blood) {
@@ -119,7 +118,7 @@ const donationRequestIntoDB = async (payload: RequestModel) => {
   const newRequest = await prisma.requestModel.create({
     data: {
       donorId: payload.donorId,
-      requesterId: payload.donorId,
+      requesterId: payload.requesterId,
       phoneNumber: payload.phoneNumber,
       dateOfDonation: payload.dateOfDonation,
       hospitalName: payload.hospitalAddress,
@@ -135,6 +134,7 @@ const donationRequestIntoDB = async (payload: RequestModel) => {
     select: {
       id: true,
       donorId: true,
+      requester: true,
       phoneNumber: true,
       dateOfDonation: true,
       hospitalName: true,
@@ -155,8 +155,37 @@ const donationRequestIntoDB = async (payload: RequestModel) => {
   };
 };
 
+// Me As a Requester
 const getDonationRequestFromDB = async (user: TAuthUser) => {
   const { userId } = user;
+
+  const donationRequests = await prisma.requestModel.findMany({
+    where: {
+      requesterId: userId,
+    },
+    include: {
+      donor: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          location: true,
+          bloodType: true,
+          availability: true,
+          userProfile: true,
+        },
+      },
+    },
+  });
+
+  return donationRequests;
+};
+
+// Me As a Donorcd
+const getMyDonationFromDB = async (user: TAuthUser) => {
+  const { userId } = user;
+
+  console.log(user);
 
   const donationRequests = await prisma.requestModel.findMany({
     where: {
@@ -171,6 +200,7 @@ const getDonationRequestFromDB = async (user: TAuthUser) => {
           location: true,
           bloodType: true,
           availability: true,
+          userProfile: true,
         },
       },
     },
@@ -183,6 +213,12 @@ const updateDonationStatusIntoDB = async (
   id: string,
   payload: Pick<RequestModel, "requestStatus">
 ) => {
+
+  console.log(payload)
+
+
+
+
   const isExist = await prisma.requestModel.findUnique({
     where: {
       id,
@@ -210,4 +246,5 @@ export const DonorServices = {
   donationRequestIntoDB,
   getDonationRequestFromDB,
   updateDonationStatusIntoDB,
+  getMyDonationFromDB,
 };

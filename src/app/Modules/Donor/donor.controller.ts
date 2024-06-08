@@ -31,6 +31,18 @@ const donationRequest = catchAsync(async (req, res) => {
   });
 });
 
+const getMyDonation = catchAsync(async (req, res) => {
+  const user = req.user as TAuthUser;
+  const result = await DonorServices.getMyDonationFromDB(user);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: "Request successfully made",
+    data: result,
+  });
+});
+
 const getDonationRequest = catchAsync(async (req, res) => {
   const user = req.user as TAuthUser;
   const result = await DonorServices.getDonationRequestFromDB(user);
@@ -62,5 +74,6 @@ export const DonorControllers = {
   getAllDonor,
   donationRequest,
   getDonationRequest,
+  getMyDonation,
   updateDonationStatus,
 };
