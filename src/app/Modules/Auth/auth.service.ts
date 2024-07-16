@@ -70,10 +70,14 @@ const loginUser = async (payload: Pick<User, "email" | "password">) => {
     );
   }
 
+
+  
   const isMatchedPassword = await comparePassword(
     payload.password,
     isExist.password
   );
+  
+  console.log(isMatchedPassword)
 
   if (!isMatchedPassword) {
     throw new AppError(

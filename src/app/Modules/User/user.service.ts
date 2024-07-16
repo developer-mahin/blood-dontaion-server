@@ -122,6 +122,12 @@ const getSingleUserFromDB = async (id: string) => {
 };
 
 const getMyProfile = async (user: TAuthUser) => {
+
+  console.log(user)
+
+
+
+
   const findUser = await prisma.user.findUnique({
     where: {
       id: user.userId,
