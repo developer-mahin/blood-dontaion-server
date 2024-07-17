@@ -122,12 +122,6 @@ const getSingleUserFromDB = async (id: string) => {
 };
 
 const getMyProfile = async (user: TAuthUser) => {
-
-  console.log(user)
-
-
-
-
   const findUser = await prisma.user.findUnique({
     where: {
       id: user.userId,
@@ -274,6 +268,31 @@ const updateProfileRoleIntoDB = async (id: string, payload: any) => {
   return result;
 };
 
+const deleteUserFromDB = async (id: string) => {
+  await prisma.user.findFirstOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    const result = await transactionClient.user.delete({
+      where: {
+        id,
+      },
+    });
+
+    await transactionClient.userProfile.delete({
+      where: {
+        userId: id,
+      },
+    });
+    return result;
+  });
+
+  return result;
+};
+
 export const UserServices = {
   getMyProfile,
   updateMyProfileIntoDB,
@@ -281,4 +300,5 @@ export const UserServices = {
   getSingleUserFromDB,
   updateProfileStatusIntoDB,
   updateProfileRoleIntoDB,
+  deleteUserFromDB,
 };

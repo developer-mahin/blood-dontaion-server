@@ -77,7 +77,6 @@ const loginUser = async (payload: Pick<User, "email" | "password">) => {
     isExist.password
   );
   
-  console.log(isMatchedPassword)
 
   if (!isMatchedPassword) {
     throw new AppError(

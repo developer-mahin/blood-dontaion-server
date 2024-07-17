@@ -14,7 +14,7 @@ model User {
   password     String
   bloodType    BloodGroup
   location     String
-  availability Boolean        @default(false)
+  availability Boolean        @default(true)
   isDontate    Boolean        @default(false)
   isRequest    Boolean        @default(false)
   role         UserRole       @default(DONOR)
